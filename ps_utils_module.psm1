@@ -14,7 +14,7 @@ function Get-ErrorText {
         FROM_HMODULE = 0x00000800;
         FROM_STRING = 0x00000400;
     }
-    
+
     $FunctionSig = @"
 [DllImport("Kernel32.dll", SetLastError=true)]
 public static extern uint FormatMessage( uint dwFlags, IntPtr lpSource,
@@ -31,18 +31,18 @@ public static extern bool FreeLibrary(IntPtr hModule);
 
     [System.IntPtr] $buffer = [System.IntPtr]::Zero
     $flags = [FORMAT_MESSAGE]::ALLOCATE_BUFFER + [FORMAT_MESSAGE]::FROM_SYSTEM + [FORMAT_MESSAGE]::IGNORE_INSERTS + [FORMAT_MESSAGE]::FROM_HMODULE
-    $flagsValue = [int]$flags; 
+    $flagsValue = [int]$flags;
     $kernel32 = Add-Type -MemberDefinition $FunctionSig -Name "Errors" -Namespace Win32Functions -PassThru -ErrorAction SilentlyContinue
 
     $ntdll = $kernel32::LoadLibrary("ntdll.dll")
     $result = $kernel32::FormatMessage($flagsValue, $ntdll, $Value, 0, [ref] $buffer, 0, 0)
     if ($ntdll) {
         $null = $kernel32::FreeLibrary($ntdll)
-    }    
+    }
 
     if ($result) {
         $valueString = [System.Runtime.InteropServices.Marshal]::PtrToStringAnsi($buffer)
-        Write-Output ('{0} -> {1}' -f $Value, $valueString)  
+        Write-Output ('{0} (0x{0:X8}) -> {1}' -f [int]$Value, $valueString)
     }
     else {
         Write-Output ("Failed to get error text")
@@ -51,7 +51,19 @@ public static extern bool FreeLibrary(IntPtr hModule);
     if ($buffer) {
         $null = $kernel32::LocalFree($buffer)
     }
- 
+
+}
+
+function Format-Integer {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Value
+    )
+
+    $test = ("Evaluate expression: {0} = 0x{0:X}" -f [int]$Value)
+    Write-Output ("{0}" -f $test)
 }
 
 Export-ModuleMember -Function Get-ErrorText
+Export-ModuleMember -Function Format-Integer
