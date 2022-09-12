@@ -1,3 +1,5 @@
+Import-Module PSReadLine
+
 Import-Module ~\Source\ps-utilities\ps_utilities.psm1
 
 Set-Alias -Name err -Value Get-ErrorText
