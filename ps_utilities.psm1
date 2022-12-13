@@ -65,5 +65,17 @@ function Format-Integer {
     Write-Output ("{0}" -f $test)
 }
 
+function New-File() {
+    $fileName = $args[0]
+    if (-not(Test-Path $fileName)) {
+        New-Item -ItemType File -Name $fileName 
+    }
+    else {
+        (Get-ChildItem $fileName).LastWriteTime = Get-Date
+    }
+}
+
+
 Export-ModuleMember -Function Get-ErrorText
 Export-ModuleMember -Function Format-Integer
+Export-ModuleMember -Function New-File
