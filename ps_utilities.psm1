@@ -66,12 +66,17 @@ function Format-Integer {
 }
 
 function New-File() {
-    $fileName = $args[0]
-    if (-not(Test-Path $fileName)) {
-        New-Item -ItemType File -Name $fileName 
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    if (-not(Test-Path $Path)) {
+        New-Item -ItemType File -Name $Path 
     }
     else {
-        (Get-ChildItem $fileName).LastWriteTime = Get-Date
+        (Get-ChildItem $Path).LastWriteTime = Get-Date
     }
 }
 
