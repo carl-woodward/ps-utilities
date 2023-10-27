@@ -75,7 +75,30 @@ function New-File() {
     }
 }
 
+function Get-ShortPath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    if (Test-Path $Path) {
+        $shortPath = New-Object -ComObject Scripting.FileSystemObject
+
+        if ((Get-Item $Path).PSIsContainer) {
+            $shortPath.GetFolder($Path).ShortPath
+        }
+        else {
+            $shortPath.GetFile($Path).ShortPath
+        }
+    }
+    else {
+        Write-Error "Path not found: $Path"
+    }
+}
+
 
 Export-ModuleMember -Function Get-ErrorText
 Export-ModuleMember -Function Format-Integer
 Export-ModuleMember -Function New-File
+Export-ModuleMember -Function Get-ShortPath
