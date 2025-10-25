@@ -39,6 +39,7 @@ foreach ($dir in $pins) {
     $shell = New-Object -ComObject Shell.Application
     $folder = $shell.Namespace($dir)
     $folder.Self.InvokeVerb("pintohome")
+    $folder.Self.InvokeVerb("Pin to Quick access")
 }
 
 # Install applications using winget.
@@ -46,16 +47,16 @@ Write-Host
 Write-Host "Installing applications." -ForegroundColor DarkYellow
 
 foreach ($app in @(
-        @("Microsoft.PowerShell", "winget", ""),
-        @("7zip.7zip", "winget", ""),
-        @("vim.vim", "winget", ""),
-        @("9P7KNL5RWT25", "msstore", " (Sysinternals Suite)")
+        @("Microsoft.PowerShell", "winget", "PowerShell"),
+        @("7zip.7zip", "winget", "7-Zip"),
+        @("vim.vim", "winget", "VIM"),
+        @("9P7KNL5RWT25", "msstore", "Sysinternals Suite")
     )) {
 
     $id = $app[0]
     $source = $app[1]
     $friendlyName = $app[2]
-    $fullName = $id + $friendlyName
+    $fullName = "$friendlyName [$id]"
 
     $str = '"{0}" from {1}.' -f $fullName, $source
     Write-Host $str -ForegroundColor DarkCyan
