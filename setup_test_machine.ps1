@@ -45,13 +45,27 @@ foreach ($dir in $pins) {
 Write-Host
 Write-Host "Installing applications." -ForegroundColor DarkYellow
 
-foreach ($app in @("Microsoft.PowerShell", "7zip.7zip", "vim.vim", "Microsoft.Sysinternals.Suite")) {
-    if (-not (winget list --id $app -q)) {
-        Write-Host "Installing '$app'."
-        winget install $app --silent --accept-source-agreements --accept-package-agreements
+foreach ($app in @(
+        @("Microsoft.PowerShell", "winget"),
+        @("7zip.7zip", "winget"),
+        @("vim.vim", "winget"),
+        @("9P7KNL5RWT25", "store")
+    )) {
+    
+    $id = $app[0]
+    $source = $app[1] 
+    
+    winget list --id $id --source $source > $null 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "'$id' from '$source' is already installed." -ForegroundColor DarkCyan
+        continue
     }
-    else {
-        Write-Host "'$app' is already installed."
+
+    Write-Host "Installing '$id' from '$source'."
+    winget install $id --accept-package-agreements
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to install '$id' from '$source'." -ForegroundColor DarkRed
+        continue
     }
 }
 
