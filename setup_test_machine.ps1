@@ -46,25 +46,34 @@ Write-Host
 Write-Host "Installing applications." -ForegroundColor DarkYellow
 
 foreach ($app in @(
-        @("Microsoft.PowerShell", "winget"),
-        @("7zip.7zip", "winget"),
-        @("vim.vim", "winget"),
-        @("9P7KNL5RWT25", "store")
+        @("Microsoft.PowerShell", "winget", ""),
+        @("7zip.7zip", "winget", ""),
+        @("vim.vim", "winget", ""),
+        @("9P7KNL5RWT25", "msstore", " (Sysinternals Suite)")
     )) {
-    
+
     $id = $app[0]
-    $source = $app[1] 
-    
+    $source = $app[1]
+    $friendlyName = $app[2]
+    $fullName = $id + $friendlyName
+
+    $str = '"{0}" from {1}.' -f $fullName, $source
+    Write-Host $str -ForegroundColor DarkCyan
+
     winget list --id $id --source $source > $null 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "'$id' from '$source' is already installed." -ForegroundColor DarkCyan
         continue
     }
 
-    Write-Host "Installing '$id' from '$source'."
     winget install $id --accept-package-agreements
+    if (($LASTEXITCODE -eq 0) -or ($LASTEXITCODE -eq -1978335189)) {
+        Write-Host "Installed $str." -ForegroundColor DarkCyan
+        continue;
+    }
+
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Failed to install '$id' from '$source'." -ForegroundColor DarkRed
+
+        Write-Host "Failed to install $str, exit code: $LASTEXITCODE." -ForegroundColor DarkRed
         continue
     }
 }
